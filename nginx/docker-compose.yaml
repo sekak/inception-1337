@@ -1,0 +1,63 @@
+version: '3.8'
+
+networks:
+  InceptionNetowrk:
+    driver: bridge
+
+volumes:
+  word_data:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/med/Desktop/wp/nginx/wordpress
+  db_data:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/med/Desktop/wp/nginx/db
+
+services:
+  nginx:
+    build: . 
+    ports:
+      - '443:443'
+    restart: always
+    volumes:
+      - word_data:/var/www
+    networks:
+      - InceptionNetowrk
+    depends_on:
+      - word
+      - db
+
+  db:
+    build: ./mariadb
+    ports:
+      - '3307:3306'
+    restart: always
+    environment:
+      WP_DB_NAME : ${WP_DB_NAME}
+      DB_USER : ${DB_USER}
+      DB_PASSWD : ${DB_PASSWD}
+      DB_ROOT_PASSWD : ${DB_ROOT_PASSWD}
+    networks:
+      - InceptionNetowrk
+    volumes:
+      - db_data:/home/db
+
+
+  word:
+    build: ./word
+    volumes:
+      - word_data:/var/www
+    networks:
+      - InceptionNetowrk
+    environment:
+      - MYSQL_DATABASE=med
+      - MYSQL_USER=med
+      - MYSQL_PASSWORD=med
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    depends_on:
+      - db
+    ports:
+      - '9000:9000'

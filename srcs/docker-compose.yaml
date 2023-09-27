@@ -1,0 +1,75 @@
+version: '3.8'
+
+networks:
+  InceptionNetowrk:
+    driver: bridge
+
+volumes:
+  word_data:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/med/Desktop/wp/srcs/wordpress
+  database:
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/med/Desktop/wp/srcs/database
+ 
+
+services:
+
+  nginx:
+    build: ./requirement/nginx
+    ports:
+      - '443:443'
+    restart: always
+    volumes:
+      - word_data:/var/www/wordpress
+    networks:
+      - InceptionNetowrk
+  wordpress:
+    build: ./requirement/wordpress
+    restart: always
+    volumes:
+      - word_data:/var/www/wordpress
+    networks:
+      - InceptionNetowrk
+  
+  # db:
+  #   image: mariadb:latest
+  #   networks:
+  #     - InceptionNetowrk
+  #   environment:
+  #     - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+    # volumes:
+    #   - word_data:
+    # # depends_on:
+    #   - wp 
+    #   - db
+    # networks:
+    #   - InceptionNetowrk
+  # wp:
+  #   build: ./requirement/wordpress
+  #   ports:
+  #     - '9000:9000'
+  #   restart: always
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - InceptionNetowrk
+ 
+  # db:
+  #   build: ./requirement/mariadb
+  #   ports:
+  #     - '3307:3306'
+  #   restart: always
+  #   networks:
+  #     - InceptionNetowrk
+  #   environment:
+  #     MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+  #     MYSQL_USER: med
+  #     MYSQL_PASSWORD: med
+  #     MYSQL_DATABASE: med
+  
+ 
